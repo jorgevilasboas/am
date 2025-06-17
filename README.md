@@ -1,113 +1,197 @@
-# User Management System
+# Sistema de Gestão de Empreendimentos
 
-A full-stack user management system with authentication and role-based access control.
+Um sistema full-stack para gerenciamento de empreendimentos imobiliários, com autenticação de usuários e controle de acesso baseado em funções (RBAC).
 
-## Features
-
-- User authentication (login/logout)
-- Role-based access control (Admin/User)
-- User management (create, list users)
-- Modern UI with Tailwind CSS
-- TypeScript support
-- PostgreSQL database with Prisma ORM
-
-## Prerequisites
-
-- Node.js (v18 or later)
-- PostgreSQL
-- Docker (optional)
-
-## Setup
+## Tecnologias Utilizadas
 
 ### Backend
-
-1. Navigate to the backend directory:
-   ```bash
-   cd backend
-   ```
-
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
-
-3. Create a `.env` file with the following content:
-   ```
-   DATABASE_URL="postgresql://postgres:postgres@localhost:5432/user_management?schema=public"
-   JWT_SECRET="your-secret-key"
-   PORT=5001
-   ```
-
-4. Run database migrations:
-   ```bash
-   npx prisma migrate dev
-   ```
-
-5. Seed the database with an admin user:
-   ```bash
-   npm run seed
-   ```
-
-6. Start the development server:
-   ```bash
-   npm run dev
-   ```
-
-### Frontend
-
-1. Navigate to the frontend directory:
-   ```bash
-   cd frontend
-   ```
-
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
-
-3. Start the development server:
-   ```bash
-   npm run dev
-   ```
-
-## Docker Setup (Optional)
-
-1. Start the PostgreSQL container:
-   ```bash
-   docker-compose up -d
-   ```
-
-2. Follow the backend setup steps (excluding database setup)
-
-## Default Admin Credentials
-
-- Email: admin@admin.com
-- Password: admin123
-
-## API Endpoints
-
-### Authentication
-- POST /api/auth/login - Login user
-- POST /api/auth/logout - Logout user
-
-### Users
-- GET /api/users - Get all users (Admin only)
-- POST /api/users - Create new user (Admin only)
-
-## Technologies Used
-
-### Backend
-- Node.js
-- Express
+- Node.js com Express
 - TypeScript
-- Prisma
+- Prisma ORM
 - PostgreSQL
-- JWT for authentication
+- JWT para autenticação
+- Docker para containerização
 
 ### Frontend
 - React
 - TypeScript
-- Tailwind CSS
-- React Query
+- Material-UI (MUI)
 - React Router
-- Axios 
+- Axios para requisições HTTP
+- Context API para gerenciamento de estado
+
+## Estrutura do Projeto
+
+```
+.
+├── backend/                 # Servidor Node.js/Express
+│   ├── prisma/             # Schema e migrações do Prisma
+│   │   ├── controllers/    # Controladores da aplicação
+│   │   ├── middleware/     # Middlewares (auth, roles)
+│   │   ├── routes/         # Rotas da API
+│   │   └── scripts/        # Scripts utilitários
+│   └── package.json
+│
+└── frontend/               # Aplicação React
+    ├── public/
+    ├── src/
+    │   ├── components/     # Componentes React
+    │   ├── contexts/       # Contextos (Auth)
+    │   ├── pages/          # Páginas da aplicação
+    │   └── App.tsx         # Componente principal
+    └── package.json
+```
+
+## Funcionalidades
+
+### Autenticação e Autorização
+- Login com email e senha
+- Tokens JWT para autenticação
+- Controle de acesso baseado em funções (ADMIN, USER)
+- Proteção de rotas no frontend e backend
+
+### Empreendimentos
+- CRUD completo de empreendimentos
+- Campos:
+  - Construtora
+  - Nome do Empreendimento
+  - Bairro
+  - Tipo
+  - Data de Entrega
+- Listagem com paginação
+- Formulários de criação e edição
+
+### Usuários
+- Gerenciamento de usuários
+- Atribuição de funções
+- Criação automática de usuário admin
+
+## Configuração e Instalação
+
+### Pré-requisitos
+- Node.js (v14 ou superior)
+- Docker e Docker Compose
+- PostgreSQL
+
+### Backend
+
+1. Entre no diretório do backend:
+```bash
+cd backend
+```
+
+2. Instale as dependências:
+```bash
+npm install
+```
+
+3. Configure as variáveis de ambiente:
+```bash
+cp .env.example .env
+```
+
+4. Execute as migrações do Prisma:
+```bash
+npx prisma migrate dev
+```
+
+5. Crie o usuário admin:
+```bash
+npm run create-admin
+```
+
+6. Inicie o servidor:
+```bash
+npm run dev
+```
+
+### Frontend
+
+1. Entre no diretório do frontend:
+```bash
+cd frontend
+```
+
+2. Instale as dependências:
+```bash
+npm install
+```
+
+3. Configure as variáveis de ambiente:
+```bash
+cp .env.example .env
+```
+
+4. Inicie a aplicação:
+```bash
+npm start
+```
+
+## Docker
+
+Para executar o projeto usando Docker:
+
+```bash
+docker-compose up -d
+```
+
+## Estrutura do Banco de Dados
+
+### User
+- id: String (UUID)
+- email: String
+- password: String (hashed)
+- role: Role (ADMIN, USER)
+- createdAt: DateTime
+- updatedAt: DateTime
+
+### Empreendimento
+- id: String (UUID)
+- construtora: String
+- nome: String
+- bairro: String
+- tipo: String
+- dataEntrega: DateTime
+- createdAt: DateTime
+- updatedAt: DateTime
+
+## API Endpoints
+
+### Autenticação
+- POST /api/auth/login - Login de usuário
+- POST /api/auth/register - Registro de usuário
+
+### Empreendimentos
+- GET /api/empreendimentos - Lista todos os empreendimentos
+- POST /api/empreendimentos - Cria um novo empreendimento
+- GET /api/empreendimentos/:id - Obtém um empreendimento específico
+- PUT /api/empreendimentos/:id - Atualiza um empreendimento
+- DELETE /api/empreendimentos/:id - Remove um empreendimento
+
+### Usuários
+- GET /api/users - Lista todos os usuários (apenas ADMIN)
+- POST /api/users - Cria um novo usuário (apenas ADMIN)
+- GET /api/users/:id - Obtém um usuário específico
+- PUT /api/users/:id - Atualiza um usuário
+- DELETE /api/users/:id - Remove um usuário
+
+## Segurança
+
+- Autenticação via JWT
+- Senhas hasheadas com bcrypt
+- Middleware de autenticação
+- Validação de funções (RBAC)
+- Proteção contra CORS
+- Validação de dados de entrada
+
+## Contribuição
+
+1. Faça um fork do projeto
+2. Crie uma branch para sua feature (`git checkout -b feature/nova-feature`)
+3. Commit suas mudanças (`git commit -m 'Adiciona nova feature'`)
+4. Push para a branch (`git push origin feature/nova-feature`)
+5. Abra um Pull Request
+
+## Licença
+
+Este projeto está sob a licença MIT. 
