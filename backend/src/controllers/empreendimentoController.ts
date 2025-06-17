@@ -23,6 +23,8 @@ export const empreendimentoController = {
       // Convert string values to their proper types
       if (data.renda) data.renda = Number(data.renda);
       if (data.dataEntrega) data.dataEntrega = new Date(data.dataEntrega);
+      if (data.area_de) data.area_de = Number(data.area_de);
+      if (data.area_ate) data.area_ate = Number(data.area_ate);
 
       // Add book file path and original name if uploaded
       if (req.file) {
@@ -81,6 +83,8 @@ export const empreendimentoController = {
       // Convert string values to their proper types
       if (data.renda) data.renda = Number(data.renda);
       if (data.dataEntrega) data.dataEntrega = new Date(data.dataEntrega);
+      if (data.area_de) data.area_de = Number(data.area_de);
+      if (data.area_ate) data.area_ate = Number(data.area_ate);
 
       // If there's a new file uploaded
       if (req.file) {

@@ -24,6 +24,8 @@ interface EmpreendimentoFormData {
   renda?: number;
   tabelaLink?: string;
   book?: string;
+  area_de?: number;
+  area_ate?: number;
 }
 
 export const EmpreendimentoForm: React.FC = () => {
@@ -42,6 +44,8 @@ export const EmpreendimentoForm: React.FC = () => {
     status: 'ACTIVE',
     renda: undefined,
     tabelaLink: '',
+    area_de: undefined,
+    area_ate: undefined,
   });
 
   useEffect(() => {
@@ -105,7 +109,7 @@ export const EmpreendimentoForm: React.FC = () => {
     } else {
       setFormData(prev => ({
         ...prev,
-        [name]: value
+        [name]: type === 'number' ? (value ? Number(value) : undefined) : value
       }));
     }
   };
@@ -195,6 +199,34 @@ export const EmpreendimentoForm: React.FC = () => {
             onChange={handleChange}
             margin="normal"
           />
+          <Box sx={{ display: 'flex', gap: 2 }}>
+            <TextField
+              fullWidth
+              label="Área De (m²)"
+              name="area_de"
+              type="number"
+              value={formData.area_de || ''}
+              onChange={handleChange}
+              margin="normal"
+              inputProps={{ step: "0.01", min: "0" }}
+              InputProps={{
+                endAdornment: <InputAdornment position="end">m²</InputAdornment>,
+              }}
+            />
+            <TextField
+              fullWidth
+              label="Área Até (m²)"
+              name="area_ate"
+              type="number"
+              value={formData.area_ate || ''}
+              onChange={handleChange}
+              margin="normal"
+              inputProps={{ step: "0.01", min: "0" }}
+              InputProps={{
+                endAdornment: <InputAdornment position="end">m²</InputAdornment>,
+              }}
+            />
+          </Box>
           <Box sx={{ mt: 2 }}>
             <input
               accept="application/pdf"

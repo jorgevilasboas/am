@@ -31,6 +31,8 @@ model Empreendimento {
   tabelaLink    String?  @db.Text
   book          String?
   bookOriginalName String? @db.Text
+  area_de       Decimal?   @db.Decimal(10,2)
+  area_ate      Decimal?   @db.Decimal(10,2)
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 }

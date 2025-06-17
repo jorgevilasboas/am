@@ -36,6 +36,10 @@ import { TextFieldProps } from '@mui/material/TextField';
 import { getLocalDateString } from '../utils/dateUtils';
 import { formatBRL } from '../utils/currencyUtils';
 
+interface User {
+  role?: 'ADMIN' | 'USER';
+}
+
 interface Empreendimento {
   id: string;
   construtora: string;
@@ -50,6 +54,8 @@ interface Empreendimento {
   renda?: number;
   tabelaLink?: string;
   book?: string;
+  area_de?: number;
+  area_ate?: number;
 }
 
 type Order = 'asc' | 'desc';
@@ -68,6 +74,8 @@ const headCells: HeadCell[] = [
   { id: 'dataEntrega', label: 'Data de Entrega', numeric: false },
   { id: 'status', label: 'Status', numeric: false },
   { id: 'renda', label: 'Renda Mínima', numeric: true },
+  { id: 'area_de', label: 'Área De', numeric: true },
+  { id: 'area_ate', label: 'Área Até', numeric: true },
   { id: 'tabelaLink', label: 'Tabela', numeric: false },
   { id: 'book', label: 'Book', numeric: false },
 ];
@@ -103,7 +111,8 @@ export const Empreendimentos: React.FC = () => {
   const [orderBy, setOrderBy] = useState<keyof Empreendimento>('createdAt');
   const [order, setOrder] = useState<Order>('desc');
   const navigate = useNavigate();
-  const user = useAuth();
+  const { user } = useAuth();
+  const isAdmin = user?.role === 'ADMIN';
 
   const fetchEmpreendimentos = async () => {
     try {
@@ -175,9 +184,9 @@ export const Empreendimentos: React.FC = () => {
       );
     })
     .sort((a, b) => {
-      if (orderBy === 'renda') {
-        const aValue = a.renda ?? 0;
-        const bValue = b.renda ?? 0;
+      if (orderBy === 'renda' || orderBy === 'area_de' || orderBy === 'area_ate') {
+        const aValue = a[orderBy] ?? 0;
+        const bValue = b[orderBy] ?? 0;
         return order === 'asc' ? aValue - bValue : bValue - aValue;
       }
 
@@ -190,7 +199,7 @@ export const Empreendimentos: React.FC = () => {
     });
 
   return (
-    <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
+    <Container maxWidth={false} sx={{ mt: 4, mb: 4, px: { xs: 2, lg: 4 } }}>
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={4}>
         <Typography variant="h4" component="h1">
           Empreendimentos
@@ -222,26 +231,94 @@ export const Empreendimentos: React.FC = () => {
         />
       </Box>
 
-      <TableContainer component={Paper}>
-        <Table>
+      <TableContainer component={Paper} sx={{ overflowX: 'auto', width: '100%' }}>
+        <Table size="small" sx={{ minWidth: 1200 }}>
           <TableHead>
             <TableRow>
-              {headCells.map((headCell) => (
-                <TableCell
-                  key={headCell.id}
-                  align={headCell.numeric ? 'right' : 'left'}
-                  sortDirection={orderBy === headCell.id ? order : false}
+              <TableCell width="12%">
+                <TableSortLabel
+                  active={orderBy === 'construtora'}
+                  direction={orderBy === 'construtora' ? order : 'asc'}
+                  onClick={() => handleRequestSort('construtora')}
                 >
-                  <TableSortLabel
-                    active={orderBy === headCell.id}
-                    direction={orderBy === headCell.id ? order : 'asc'}
-                    onClick={() => handleRequestSort(headCell.id)}
-                  >
-                    {headCell.label}
-                  </TableSortLabel>
-                </TableCell>
-              ))}
-              <TableCell align="right">Ações</TableCell>
+                  Construtora
+                </TableSortLabel>
+              </TableCell>
+              <TableCell width="15%">
+                <TableSortLabel
+                  active={orderBy === 'empreendimento'}
+                  direction={orderBy === 'empreendimento' ? order : 'asc'}
+                  onClick={() => handleRequestSort('empreendimento')}
+                >
+                  Empreendimento
+                </TableSortLabel>
+              </TableCell>
+              <TableCell width="12%">
+                <TableSortLabel
+                  active={orderBy === 'bairro'}
+                  direction={orderBy === 'bairro' ? order : 'asc'}
+                  onClick={() => handleRequestSort('bairro')}
+                >
+                  Bairro
+                </TableSortLabel>
+              </TableCell>
+              <TableCell width="8%">
+                <TableSortLabel
+                  active={orderBy === 'tipo'}
+                  direction={orderBy === 'tipo' ? order : 'asc'}
+                  onClick={() => handleRequestSort('tipo')}
+                >
+                  Tipo
+                </TableSortLabel>
+              </TableCell>
+              <TableCell width="10%">
+                <TableSortLabel
+                  active={orderBy === 'dataEntrega'}
+                  direction={orderBy === 'dataEntrega' ? order : 'asc'}
+                  onClick={() => handleRequestSort('dataEntrega')}
+                >
+                  Data de Entrega
+                </TableSortLabel>
+              </TableCell>
+              <TableCell width="8%">
+                <TableSortLabel
+                  active={orderBy === 'status'}
+                  direction={orderBy === 'status' ? order : 'asc'}
+                  onClick={() => handleRequestSort('status')}
+                >
+                  Status
+                </TableSortLabel>
+              </TableCell>
+              <TableCell width="8%" align="right">
+                <TableSortLabel
+                  active={orderBy === 'renda'}
+                  direction={orderBy === 'renda' ? order : 'asc'}
+                  onClick={() => handleRequestSort('renda')}
+                >
+                  Renda Mínima
+                </TableSortLabel>
+              </TableCell>
+              <TableCell width="8%" align="right">
+                <TableSortLabel
+                  active={orderBy === 'area_de'}
+                  direction={orderBy === 'area_de' ? order : 'asc'}
+                  onClick={() => handleRequestSort('area_de')}
+                >
+                  Área De
+                </TableSortLabel>
+              </TableCell>
+              <TableCell width="8%" align="right">
+                <TableSortLabel
+                  active={orderBy === 'area_ate'}
+                  direction={orderBy === 'area_ate' ? order : 'asc'}
+                  onClick={() => handleRequestSort('area_ate')}
+                >
+                  Área Até
+                </TableSortLabel>
+              </TableCell>
+              <TableCell width="4%" align="center">Tabela</TableCell>
+              <TableCell width="4%" align="center">Book</TableCell>
+              <TableCell width="3%" align="right">Ações</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -258,19 +335,29 @@ export const Empreendimentos: React.FC = () => {
                 <TableCell align="right">
                   {formatBRL(empreendimento.renda)}
                 </TableCell>
-                <TableCell>
-                  {empreendimento.tabelaLink && (
+                <TableCell align="right">
+                  {empreendimento.area_de !== undefined && empreendimento.area_de !== null
+                    ? `${Number(empreendimento.area_de).toFixed(2)} m²`
+                    : '-'}
+                </TableCell>
+                <TableCell align="right">
+                  {empreendimento.area_ate !== undefined && empreendimento.area_ate !== null
+                    ? `${Number(empreendimento.area_ate).toFixed(2)} m²`
+                    : '-'}
+                </TableCell>
+                <TableCell align="center">
+                  {typeof empreendimento.tabelaLink === 'string' && empreendimento.tabelaLink && (
                     <Tooltip title="Ver Tabela">
                       <IconButton
                         size="small"
-                        onClick={() => window.open(empreendimento.tabelaLink, '_blank')}
+                        onClick={() => window.open(empreendimento.tabelaLink as string, '_blank')}
                       >
                         <TableChartIcon />
                       </IconButton>
                     </Tooltip>
                   )}
                 </TableCell>
-                <TableCell>
+                <TableCell align="center">
                   {empreendimento.book && (
                     <Tooltip title="Download Book">
                       <IconButton
@@ -289,7 +376,7 @@ export const Empreendimentos: React.FC = () => {
                   >
                     <EditIcon />
                   </IconButton>
-                  {user?.role === 'ADMIN' && (
+                  {isAdmin && (
                     <IconButton
                       size="small"
                       onClick={() => handleDelete(empreendimento.id)}
