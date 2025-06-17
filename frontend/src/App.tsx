@@ -8,6 +8,8 @@ import UserManagement from './pages/UserManagement';
 import { Empreendimentos } from './pages/Empreendimentos';
 import { Leads } from './pages/Leads';
 import { EmpreendimentoForm } from './components/EmpreendimentoForm';
+import { Users } from './pages/Users';
+import Signup from './pages/Signup';
 
 const queryClient = new QueryClient();
 
@@ -35,10 +37,11 @@ function App() {
               path="/users"
               element={
                 <PrivateRoute>
-                  <UserManagement />
+                  <Users />
                 </PrivateRoute>
               }
             />
+            <Route path="/signup" element={<Signup />} />
             <Route
               path="/leads"
               element={

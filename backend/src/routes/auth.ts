@@ -48,4 +48,37 @@ router.post('/login', async (req, res, next) => {
   }
 });
 
+router.post('/signup', async (req, res, next) => {
+  try {
+    const { name, email, password } = req.body;
+
+    const existingUser = await prisma.user.findUnique({ where: { email } });
+    if (existingUser) {
+      throw new AppError('Email already in use', 400);
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 12);
+    const user = await prisma.user.create({
+      data: {
+        name,
+        email,
+        password: hashedPassword,
+        role: 'USER',
+        aprovado: false,
+      },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role: true,
+        aprovado: true,
+        createdAt: true,
+      },
+    });
+    res.status(201).json(user);
+  } catch (error) {
+    next(error);
+  }
+});
+
 export default router; 

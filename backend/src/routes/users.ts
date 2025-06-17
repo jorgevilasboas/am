@@ -19,10 +19,33 @@ router.get('/', restrictTo('ADMIN'), async (req, res, next) => {
         name: true,
         email: true,
         role: true,
+        aprovado: true,
         createdAt: true,
       },
     });
     res.json(users);
+  } catch (error) {
+    next(error);
+  }
+});
+
+// Aprovar usuário (admin only)
+router.patch('/:id/aprovar', restrictTo('ADMIN'), async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const user = await prisma.user.update({
+      where: { id },
+      data: { aprovado: true },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role: true,
+        aprovado: true,
+        createdAt: true,
+      },
+    });
+    res.json(user);
   } catch (error) {
     next(error);
   }
@@ -49,12 +72,14 @@ router.post('/', restrictTo('ADMIN'), async (req, res, next) => {
         email,
         password: hashedPassword,
         role,
+        aprovado: true,
       },
       select: {
         id: true,
         name: true,
         email: true,
         role: true,
+        aprovado: true,
         createdAt: true,
       },
     });
