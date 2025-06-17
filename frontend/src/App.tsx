@@ -1,75 +1,20 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { AuthProvider, useAuth } from './contexts/AuthContext';
-import { Layout } from './components/Layout';
-import Login from './pages/Login';
-import UserManagement from './pages/UserManagement';
-import { Empreendimentos } from './pages/Empreendimentos';
-import { Leads } from './pages/Leads';
-import { EmpreendimentoForm } from './components/EmpreendimentoForm';
-import { Users } from './pages/Users';
-import Signup from './pages/Signup';
-
-const queryClient = new QueryClient();
-
-const PrivateRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { isAuthenticated } = useAuth();
-  return isAuthenticated ? <Layout>{children}</Layout> : <Navigate to="/login" />;
-};
+import { BrowserRouter } from 'react-router-dom';
+import { ThemeProvider, CssBaseline } from '@mui/material';
+import { theme } from './theme';
+import { AuthProvider } from './contexts/AuthContext';
+import AppRoutes from './routes';
 
 function App() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <Router>
-          <Routes>
-            <Route path="/login" element={<Login />} />
-            <Route
-              path="/"
-              element={
-                <PrivateRoute>
-                  <Empreendimentos />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/users"
-              element={
-                <PrivateRoute>
-                  <Users />
-                </PrivateRoute>
-              }
-            />
-            <Route path="/signup" element={<Signup />} />
-            <Route
-              path="/leads"
-              element={
-                <PrivateRoute>
-                  <Leads />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/empreendimentos/new"
-              element={
-                <PrivateRoute>
-                  <EmpreendimentoForm />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/empreendimentos/:id/edit"
-              element={
-                <PrivateRoute>
-                  <EmpreendimentoForm />
-                </PrivateRoute>
-              }
-            />
-          </Routes>
-        </Router>
-      </AuthProvider>
-    </QueryClientProvider>
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      <BrowserRouter>
+        <AuthProvider>
+          <AppRoutes />
+        </AuthProvider>
+      </BrowserRouter>
+    </ThemeProvider>
   );
 }
 

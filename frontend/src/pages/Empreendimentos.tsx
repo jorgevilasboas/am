@@ -24,7 +24,8 @@ import {
   Delete as DeleteIcon,
   Search as SearchIcon,
   TableChart as TableChartIcon,
-  MenuBook as MenuBookIcon
+  MenuBook as MenuBookIcon,
+  Business as BusinessIcon
 } from '@mui/icons-material';
 import { useAuth } from '../contexts/AuthContext';
 import axios from 'axios';
@@ -207,7 +208,7 @@ export const Empreendimentos: React.FC = () => {
         <Button
           variant="contained"
           color="primary"
-          startIcon={<AddIcon />}
+          startIcon={<BusinessIcon />}
           onClick={() => navigate('/empreendimentos/new')}
         >
           Novo Empreendimento
