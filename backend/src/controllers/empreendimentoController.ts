@@ -9,6 +9,7 @@ export const empreendimentoController = {
       const empreendimento = await empreendimentoModel.create(data);
       res.status(201).json(empreendimento);
     } catch (error) {
+      console.error('Error creating empreendimento:', error);
       next(error);
     }
   },
@@ -18,6 +19,7 @@ export const empreendimentoController = {
       const empreendimentos = await empreendimentoModel.findAll();
       res.json(empreendimentos);
     } catch (error) {
+      console.error('Error fetching empreendimentos:', error);
       next(error);
     }
   },
@@ -33,6 +35,7 @@ export const empreendimentoController = {
 
       res.json(empreendimento);
     } catch (error) {
+      console.error('Error fetching empreendimento:', error);
       next(error);
     }
   },
@@ -42,9 +45,20 @@ export const empreendimentoController = {
       const { id } = req.params;
       const data = req.body;
 
+      // Convert dataEntrega to Date if it exists
+      if (data.dataEntrega) {
+        data.dataEntrega = new Date(data.dataEntrega);
+      }
+
+      // Convert renda to number if it exists
+      if (data.renda !== undefined && data.renda !== null && data.renda !== '') {
+        data.renda = parseFloat(data.renda);
+      }
+
       const empreendimento = await empreendimentoModel.update(id, data);
       res.json(empreendimento);
     } catch (error) {
+      console.error('Error updating empreendimento:', error);
       next(error);
     }
   },
@@ -55,6 +69,7 @@ export const empreendimentoController = {
       await empreendimentoModel.delete(id);
       res.status(204).send();
     } catch (error) {
+      console.error('Error deleting empreendimento:', error);
       next(error);
     }
   },

@@ -15,13 +15,15 @@ import {
   TableRow,
   Paper,
   TableSortLabel,
-  InputAdornment
+  InputAdornment,
+  Tooltip
 } from '@mui/material';
 import {
   Add as AddIcon,
   Edit as EditIcon,
   Delete as DeleteIcon,
-  Search as SearchIcon
+  Search as SearchIcon,
+  TableChart as TableChartIcon
 } from '@mui/icons-material';
 import { useAuth } from '../contexts/AuthContext';
 import axios from 'axios';
@@ -43,7 +45,7 @@ interface Empreendimento {
   createdAt: string;
   updatedAt: string;
   renda?: number;
-  entrada?: number;
+  tabelaLink?: string;
 }
 
 type Order = 'asc' | 'desc';
@@ -61,8 +63,8 @@ const headCells: HeadCell[] = [
   { id: 'tipo', label: 'Tipo', numeric: false },
   { id: 'dataEntrega', label: 'Data de Entrega', numeric: false },
   { id: 'status', label: 'Status', numeric: false },
-  { id: 'renda', label: 'Renda', numeric: true },
-  { id: 'entrada', label: 'Entrada', numeric: true },
+  { id: 'renda', label: 'Renda Mínima', numeric: true },
+  { id: 'tabelaLink', label: 'Tabela', numeric: false },
 ];
 
 // Função utilitária para exibir a data ignorando timezone
@@ -72,10 +74,13 @@ const getLocalDateString = (isoDate: string) => {
   return `${day}/${month}/${year}`;
 };
 
-// Função utilitária para formatar valores em BRL
-const formatBRL = (value: number | undefined) => {
+// Função para formatar valores em BRL
+const formatBRL = (value?: number) => {
   if (value === undefined || value === null) return '-';
-  return value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', minimumFractionDigits: 2 });
+  return new Intl.NumberFormat('pt-BR', {
+    style: 'currency',
+    currency: 'BRL'
+  }).format(value);
 };
 
 function NumberFormatCustom(props: NumericFormatProps & { inputRef: any }) {
@@ -147,25 +152,22 @@ export const Empreendimentos: React.FC = () => {
         empreendimento.construtora.toLowerCase().includes(searchLower) ||
         empreendimento.empreendimento.toLowerCase().includes(searchLower) ||
         empreendimento.bairro.toLowerCase().includes(searchLower) ||
-        empreendimento.tipo.toLowerCase().includes(searchLower) ||
-        empreendimento.status.toLowerCase().includes(searchLower)
+        empreendimento.tipo.toLowerCase().includes(searchLower)
       );
     })
     .sort((a, b) => {
-      const aValue = a[orderBy] ?? '';
-      const bValue = b[orderBy] ?? '';
-
-      // Se ambos undefined, iguais
-      if (aValue === '' && bValue === '') return 0;
-      // Se só um undefined, ele vai para o final
-      if (aValue === '') return 1;
-      if (bValue === '') return -1;
-
-      if (order === 'asc') {
-        return aValue < bValue ? -1 : aValue > bValue ? 1 : 0;
-      } else {
-        return aValue > bValue ? -1 : aValue < bValue ? 1 : 0;
+      if (orderBy === 'renda') {
+        const aValue = a.renda ?? 0;
+        const bValue = b.renda ?? 0;
+        return order === 'asc' ? aValue - bValue : bValue - aValue;
       }
+
+      const aStr = a[orderBy]?.toString() ?? '';
+      const bStr = b[orderBy]?.toString() ?? '';
+      
+      return order === 'asc'
+        ? aStr.localeCompare(bStr)
+        : bStr.localeCompare(aStr);
     });
 
   return (
@@ -237,8 +239,17 @@ export const Empreendimentos: React.FC = () => {
                 <TableCell align="right">
                   {formatBRL(empreendimento.renda)}
                 </TableCell>
-                <TableCell align="right">
-                  {formatBRL(empreendimento.entrada)}
+                <TableCell>
+                  {empreendimento.tabelaLink && (
+                    <Tooltip title="Abrir tabela">
+                      <IconButton
+                        size="small"
+                        onClick={() => window.open(empreendimento.tabelaLink, '_blank')}
+                      >
+                        <TableChartIcon />
+                      </IconButton>
+                    </Tooltip>
+                  )}
                 </TableCell>
                 <TableCell align="right">
                   <IconButton

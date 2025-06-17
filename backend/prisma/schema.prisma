@@ -27,6 +27,8 @@ model Empreendimento {
   dataEntrega   DateTime
   description   String
   status        String   @default("ACTIVE")
+  renda         Float?
+  tabelaLink    String?  @db.Text
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 }

@@ -90,4 +90,33 @@ router.post('/', restrictTo('ADMIN'), async (req, res, next) => {
   }
 });
 
+// Delete user (admin only)
+router.delete('/:id', restrictTo('ADMIN'), async (req, res, next) => {
+  try {
+    const { id } = req.params;
+
+    // Prevent deleting the last admin user
+    const adminCount = await prisma.user.count({
+      where: { role: 'ADMIN' }
+    });
+
+    const userToDelete = await prisma.user.findUnique({
+      where: { id },
+      select: { role: true }
+    });
+
+    if (adminCount === 1 && userToDelete?.role === 'ADMIN') {
+      throw new AppError('Cannot delete the last admin user', 400);
+    }
+
+    await prisma.user.delete({
+      where: { id }
+    });
+
+    res.status(204).send();
+  } catch (error) {
+    next(error);
+  }
+});
+
 export default router; 

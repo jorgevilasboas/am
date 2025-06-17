@@ -3,9 +3,15 @@ import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
 export interface CreateEmpreendimentoInput {
-  name: string;
+  construtora: string;
+  empreendimento: string;
+  bairro: string;
+  tipo: string;
+  dataEntrega: Date;
   description: string;
-  status: 'ACTIVE' | 'INACTIVE';
+  status?: string;
+  renda?: number;
+  tabelaLink?: string;
 }
 
 export interface UpdateEmpreendimentoInput extends Partial<CreateEmpreendimentoInput> {}

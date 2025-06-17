@@ -7,7 +7,8 @@ import {
   TextField,
   Typography,
   MenuItem,
-  Paper
+  Paper,
+  InputAdornment
 } from '@mui/material';
 import { useAuth } from '../contexts/AuthContext';
 import axios from 'axios';
@@ -20,6 +21,8 @@ interface EmpreendimentoFormData {
   dataEntrega: string;
   description: string;
   status: 'ACTIVE' | 'INACTIVE';
+  renda?: number;
+  tabelaLink?: string;
 }
 
 export const EmpreendimentoForm: React.FC = () => {
@@ -34,7 +37,9 @@ export const EmpreendimentoForm: React.FC = () => {
     tipo: '',
     dataEntrega: '',
     description: '',
-    status: 'ACTIVE'
+    status: 'ACTIVE',
+    renda: undefined,
+    tabelaLink: ''
   });
 
   useEffect(() => {
@@ -147,6 +152,26 @@ export const EmpreendimentoForm: React.FC = () => {
             onChange={handleChange}
             multiline
             rows={4}
+            margin="normal"
+          />
+          <TextField
+            fullWidth
+            label="Renda Mínima"
+            name="renda"
+            type="number"
+            value={formData.renda || ''}
+            onChange={handleChange}
+            margin="normal"
+            InputProps={{
+              startAdornment: <InputAdornment position="start">R$</InputAdornment>,
+            }}
+          />
+          <TextField
+            fullWidth
+            label="Link da Tabela"
+            name="tabelaLink"
+            value={formData.tabelaLink}
+            onChange={handleChange}
             margin="normal"
           />
           <TextField
