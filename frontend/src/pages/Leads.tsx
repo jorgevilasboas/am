@@ -32,6 +32,8 @@ import axios from 'axios';
 import { Lead } from '../types/Lead';
 import { format, parseISO } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { NumericFormat, NumericFormatProps } from 'react-number-format';
+import { MoneyInput } from '../components/MoneyInput';
 
 type Order = 'asc' | 'desc';
 
@@ -50,6 +52,38 @@ const headCells: HeadCell[] = [
   { id: 'entrada', label: 'Entrada', numeric: true },
 ];
 
+function NumberFormatCustom(props: NumericFormatProps & { inputRef: any }) {
+  const { inputRef, onChange, ...other } = props;
+  return (
+    <NumericFormat
+      {...other}
+      getInputRef={inputRef}
+      thousandSeparator='.'
+      decimalSeparator=','
+      decimalScale={2}
+      fixedDecimalScale
+      allowNegative={false}
+      prefix=""
+      onValueChange={(values) => {
+        onChange({
+          target: {
+            name: props.name,
+            value: values.value,
+          },
+        });
+      }}
+      valueIsNumericString
+    />
+  );
+}
+
+// Função para formatar string de centavos para BRL
+function formatCentavosToBRL(value: string) {
+  if (!value) return '';
+  const number = parseFloat(value) / 100;
+  return number.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+}
+
 export const Leads: React.FC = () => {
   const [leads, setLeads] = useState<Lead[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
@@ -57,14 +91,14 @@ export const Leads: React.FC = () => {
   const [order, setOrder] = useState<Order>('desc');
   const [openDialog, setOpenDialog] = useState(false);
   const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
-  const [formData, setFormData] = useState<Partial<Lead>>({
+  const [formData, setFormData] = useState<Partial<Lead & { rendaRaw?: string; entradaRaw?: string }>>({
     nome: '',
     telefone: '',
     email: '',
     crmLink: '',
-    renda: undefined,
+    rendaRaw: '',
     dataNascimento: '',
-    entrada: undefined,
+    entradaRaw: '',
     anotacoes: ''
   });
 
@@ -103,7 +137,9 @@ export const Leads: React.FC = () => {
       setSelectedLead(lead);
       setFormData({
         ...lead,
-        dataNascimento: lead.dataNascimento ? format(parseISO(lead.dataNascimento), 'yyyy-MM-dd') : ''
+        dataNascimento: lead.dataNascimento ? format(parseISO(lead.dataNascimento), 'yyyy-MM-dd') : '',
+        rendaRaw: lead.renda ? (lead.renda * 100).toString() : '',
+        entradaRaw: lead.entrada ? (lead.entrada * 100).toString() : ''
       });
     } else {
       setSelectedLead(null);
@@ -112,9 +148,9 @@ export const Leads: React.FC = () => {
         telefone: '',
         email: '',
         crmLink: '',
-        renda: undefined,
+        rendaRaw: '',
         dataNascimento: '',
-        entrada: undefined,
+        entradaRaw: '',
         anotacoes: ''
       });
     }
@@ -312,15 +348,17 @@ export const Leads: React.FC = () => {
                 />
               </Grid>
               <Grid item xs={12} sm={6}>
-                <TextField
+                <MoneyInput
                   fullWidth
                   label="Renda"
                   name="renda"
-                  type="number"
-                  value={formData.renda}
-                  onChange={handleInputChange}
-                  InputProps={{
-                    startAdornment: <InputAdornment position="start">R$</InputAdornment>,
+                  value={formData.rendaRaw ?? ''}
+                  onChange={(raw, floatValue) => {
+                    setFormData((prev) => ({
+                      ...prev,
+                      rendaRaw: raw,
+                      renda: floatValue,
+                    }));
                   }}
                 />
               </Grid>
@@ -338,15 +376,17 @@ export const Leads: React.FC = () => {
                 />
               </Grid>
               <Grid item xs={12} sm={6}>
-                <TextField
+                <MoneyInput
                   fullWidth
                   label="Entrada"
                   name="entrada"
-                  type="number"
-                  value={formData.entrada}
-                  onChange={handleInputChange}
-                  InputProps={{
-                    startAdornment: <InputAdornment position="start">R$</InputAdornment>,
+                  value={formData.entradaRaw ?? ''}
+                  onChange={(raw, floatValue) => {
+                    setFormData((prev) => ({
+                      ...prev,
+                      entradaRaw: raw,
+                      entrada: floatValue,
+                    }));
                   }}
                 />
               </Grid>

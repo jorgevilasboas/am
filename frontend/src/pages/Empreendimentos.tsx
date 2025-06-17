@@ -27,6 +27,9 @@ import { useAuth } from '../contexts/AuthContext';
 import axios from 'axios';
 import { format, parseISO } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import NumberFormat from 'react-number-format';
+import { NumericFormat, NumericFormatProps } from 'react-number-format';
+import { TextFieldProps } from '@mui/material/TextField';
 
 interface Empreendimento {
   id: string;
@@ -39,6 +42,8 @@ interface Empreendimento {
   status: 'ACTIVE' | 'INACTIVE';
   createdAt: string;
   updatedAt: string;
+  renda?: number;
+  entrada?: number;
 }
 
 type Order = 'asc' | 'desc';
@@ -56,6 +61,8 @@ const headCells: HeadCell[] = [
   { id: 'tipo', label: 'Tipo', numeric: false },
   { id: 'dataEntrega', label: 'Data de Entrega', numeric: false },
   { id: 'status', label: 'Status', numeric: false },
+  { id: 'renda', label: 'Renda', numeric: true },
+  { id: 'entrada', label: 'Entrada', numeric: true },
 ];
 
 // Função utilitária para exibir a data ignorando timezone
@@ -64,6 +71,37 @@ const getLocalDateString = (isoDate: string) => {
   const [year, month, day] = isoDate.split('T')[0].split('-');
   return `${day}/${month}/${year}`;
 };
+
+// Função utilitária para formatar valores em BRL
+const formatBRL = (value: number | undefined) => {
+  if (value === undefined || value === null) return '-';
+  return value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', minimumFractionDigits: 2 });
+};
+
+function NumberFormatCustom(props: NumericFormatProps & { inputRef: any }) {
+  const { inputRef, onChange, ...other } = props;
+  return (
+    <NumericFormat
+      {...other}
+      getInputRef={inputRef}
+      thousandSeparator='.'
+      decimalSeparator=','
+      decimalScale={2}
+      fixedDecimalScale
+      allowNegative={false}
+      prefix=""
+      onValueChange={(values) => {
+        onChange({
+          target: {
+            name: props.name,
+            value: values.value,
+          },
+        });
+      }}
+      valueIsNumericString
+    />
+  );
+}
 
 export const Empreendimentos: React.FC = () => {
   const [empreendimentos, setEmpreendimentos] = useState<Empreendimento[]>([]);
@@ -114,8 +152,14 @@ export const Empreendimentos: React.FC = () => {
       );
     })
     .sort((a, b) => {
-      const aValue = a[orderBy];
-      const bValue = b[orderBy];
+      const aValue = a[orderBy] ?? '';
+      const bValue = b[orderBy] ?? '';
+
+      // Se ambos undefined, iguais
+      if (aValue === '' && bValue === '') return 0;
+      // Se só um undefined, ele vai para o final
+      if (aValue === '') return 1;
+      if (bValue === '') return -1;
 
       if (order === 'asc') {
         return aValue < bValue ? -1 : aValue > bValue ? 1 : 0;
@@ -190,6 +234,12 @@ export const Empreendimentos: React.FC = () => {
                   {getLocalDateString(empreendimento.dataEntrega)}
                 </TableCell>
                 <TableCell>{empreendimento.status}</TableCell>
+                <TableCell align="right">
+                  {formatBRL(empreendimento.renda)}
+                </TableCell>
+                <TableCell align="right">
+                  {formatBRL(empreendimento.entrada)}
+                </TableCell>
                 <TableCell align="right">
                   <IconButton
                     size="small"
