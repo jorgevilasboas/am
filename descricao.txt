@@ -1,0 +1,127 @@
+=== WEB APP DEVELOPMENT GUIDE ===
+
+REQUIREMENTS:
+- Full-stack JavaScript/TypeScript
+- User authentication system
+- 2 main entities: Leads and Developments
+- File upload functionality
+
+RECOMMENDED TECH STACK:
+
+BACKEND:
+• Fastify or Express
+• Prisma (ORM)
+• Postgres
+• JWT authentication
+
+FRONTEND:
+• Next.js or Vite+React
+• Tailwind CSS
+• React Hook Form
+• Axios
+
+DATA MODELS (Prisma Schema):
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Lead {
+  id           String   @id @default(uuid())
+  nome         String
+  telefone     String
+  email        String
+  rendaBruta   Float
+  dataNascimento DateTime
+  fgts         Boolean
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Empreendimento {
+  id                  String   @id @default(uuid())
+  nome                String
+  construtora         String
+  gerente             String
+  bairro              String
+  valorInicial        Float
+  valorFinal          Float
+  unidadesDisponiveis Int
+  arquivos            Arquivo[]
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+}
+
+model Arquivo {
+  id              String   @id @default(uuid())
+  nome            String
+  caminho         String
+  empreendimento  Empreendimento @relation(fields: [empreendimentoId], references: [id])
+  empreendimentoId String
+  createdAt       DateTime @default(now())
+}
+
+CORE FUNCTIONALITIES:
+
+1. AUTHENTICATION:
+- User registration/login
+- Password recovery
+- Protected routes
+
+2. LEADS MANAGEMENT:
+- Full CRUD operations
+- Filtering and pagination
+- CSV export
+
+3. DEVELOPMENTS MANAGEMENT:
+- Full CRUD operations
+- Multiple file uploads
+- Search by location/builder/price range
+
+4. DASHBOARD:
+- Leads statistics
+- Developments summary
+- Basic charts
+
+IMPLEMENTATION GUIDE:
+
+1. Backend:
+- Set up Fastify/Express server
+- Configure Prisma with Postgres
+- Implement JWT authentication
+- Create RESTful endpoints
+- Add file upload support
+
+2. Frontend:
+- Develop using Next.js App Router
+- Create pages for:
+  - Authentication
+  - Leads CRUD
+  - Developments CRUD
+  - File uploads
+- Style with Tailwind CSS
+- Manage forms with React Hook Form
+- Use Zustand for state management
+
+DEVELOPMENT TIPS:
+
+1. Start with Prisma schema and migrations
+2. Use json-server for API mocking during frontend dev
+3. Leverage UI component libraries (like shadcn/ui)
+4. Implement features in small, testable increments
+5. Set up ESLint/Prettier for code quality
+6. Add basic Jest tests
+7. Configure Docker for dev environment
+
+MVP FIRST, THEN FEATURES:
+1. Basic authentication
+2. Simple CRUD for both entities
+3. File upload capability
+4. Then add advanced features:
+   - Data export
+   - Advanced filters
+   - Dashboard analytics
