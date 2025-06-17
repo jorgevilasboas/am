@@ -23,7 +23,8 @@ import {
   Edit as EditIcon,
   Delete as DeleteIcon,
   Search as SearchIcon,
-  TableChart as TableChartIcon
+  TableChart as TableChartIcon,
+  MenuBook as MenuBookIcon
 } from '@mui/icons-material';
 import { useAuth } from '../contexts/AuthContext';
 import axios from 'axios';
@@ -32,6 +33,8 @@ import { ptBR } from 'date-fns/locale';
 import NumberFormat from 'react-number-format';
 import { NumericFormat, NumericFormatProps } from 'react-number-format';
 import { TextFieldProps } from '@mui/material/TextField';
+import { getLocalDateString } from '../utils/dateUtils';
+import { formatBRL } from '../utils/currencyUtils';
 
 interface Empreendimento {
   id: string;
@@ -46,6 +49,7 @@ interface Empreendimento {
   updatedAt: string;
   renda?: number;
   tabelaLink?: string;
+  book?: string;
 }
 
 type Order = 'asc' | 'desc';
@@ -65,23 +69,8 @@ const headCells: HeadCell[] = [
   { id: 'status', label: 'Status', numeric: false },
   { id: 'renda', label: 'Renda Mínima', numeric: true },
   { id: 'tabelaLink', label: 'Tabela', numeric: false },
+  { id: 'book', label: 'Book', numeric: false },
 ];
-
-// Função utilitária para exibir a data ignorando timezone
-const getLocalDateString = (isoDate: string) => {
-  if (!isoDate) return '-';
-  const [year, month, day] = isoDate.split('T')[0].split('-');
-  return `${day}/${month}/${year}`;
-};
-
-// Função para formatar valores em BRL
-const formatBRL = (value?: number) => {
-  if (value === undefined || value === null) return '-';
-  return new Intl.NumberFormat('pt-BR', {
-    style: 'currency',
-    currency: 'BRL'
-  }).format(value);
-};
 
 function NumberFormatCustom(props: NumericFormatProps & { inputRef: any }) {
   const { inputRef, onChange, ...other } = props;
@@ -114,6 +103,7 @@ export const Empreendimentos: React.FC = () => {
   const [orderBy, setOrderBy] = useState<keyof Empreendimento>('createdAt');
   const [order, setOrder] = useState<Order>('desc');
   const navigate = useNavigate();
+  const user = useAuth();
 
   const fetchEmpreendimentos = async () => {
     try {
@@ -143,6 +133,35 @@ export const Empreendimentos: React.FC = () => {
     const isAsc = orderBy === property && order === 'asc';
     setOrder(isAsc ? 'desc' : 'asc');
     setOrderBy(property);
+  };
+
+  const handleDownloadBook = async (id: string) => {
+    try {
+      // First, get the book info with the correct download URL
+      const infoResponse = await axios.get(`/api/empreendimentos/${id}/book-info`);
+      const { downloadUrl, filename } = infoResponse.data;
+
+      // Now download the file
+      const response = await axios.get(downloadUrl, {
+        responseType: 'blob'
+      });
+      
+      // Create download link
+      const url = window.URL.createObjectURL(new Blob([response.data], { type: 'application/pdf' }));
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = filename; // Use the filename from the info response
+      document.body.appendChild(link);
+      link.click();
+      
+      // Cleanup
+      setTimeout(() => {
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
+      }, 100);
+    } catch (error) {
+      console.error('Error downloading book:', error);
+    }
   };
 
   const filteredEmpreendimentos = empreendimentos
@@ -241,12 +260,24 @@ export const Empreendimentos: React.FC = () => {
                 </TableCell>
                 <TableCell>
                   {empreendimento.tabelaLink && (
-                    <Tooltip title="Abrir tabela">
+                    <Tooltip title="Ver Tabela">
                       <IconButton
                         size="small"
                         onClick={() => window.open(empreendimento.tabelaLink, '_blank')}
                       >
                         <TableChartIcon />
+                      </IconButton>
+                    </Tooltip>
+                  )}
+                </TableCell>
+                <TableCell>
+                  {empreendimento.book && (
+                    <Tooltip title="Download Book">
+                      <IconButton
+                        size="small"
+                        onClick={() => handleDownloadBook(empreendimento.id)}
+                      >
+                        <MenuBookIcon />
                       </IconButton>
                     </Tooltip>
                   )}
@@ -258,12 +289,14 @@ export const Empreendimentos: React.FC = () => {
                   >
                     <EditIcon />
                   </IconButton>
-                  <IconButton
-                    size="small"
-                    onClick={() => handleDelete(empreendimento.id)}
-                  >
-                    <DeleteIcon />
-                  </IconButton>
+                  {user?.role === 'ADMIN' && (
+                    <IconButton
+                      size="small"
+                      onClick={() => handleDelete(empreendimento.id)}
+                    >
+                      <DeleteIcon />
+                    </IconButton>
+                  )}
                 </TableCell>
               </TableRow>
             ))}

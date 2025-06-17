@@ -12,6 +12,8 @@ export interface CreateEmpreendimentoInput {
   status?: string;
   renda?: number;
   tabelaLink?: string;
+  book?: string;
+  bookOriginalName?: string;
 }
 
 export interface UpdateEmpreendimentoInput extends Partial<CreateEmpreendimentoInput> {}

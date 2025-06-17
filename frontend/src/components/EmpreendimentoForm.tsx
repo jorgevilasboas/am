@@ -23,12 +23,14 @@ interface EmpreendimentoFormData {
   status: 'ACTIVE' | 'INACTIVE';
   renda?: number;
   tabelaLink?: string;
+  book?: string;
 }
 
 export const EmpreendimentoForm: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const isEditing = !!id;
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
   const [formData, setFormData] = useState<EmpreendimentoFormData>({
     construtora: '',
@@ -39,7 +41,7 @@ export const EmpreendimentoForm: React.FC = () => {
     description: '',
     status: 'ACTIVE',
     renda: undefined,
-    tabelaLink: ''
+    tabelaLink: '',
   });
 
   useEffect(() => {
@@ -69,10 +71,24 @@ export const EmpreendimentoForm: React.FC = () => {
         : '/api/empreendimentos';
       
       const method = isEditing ? 'patch' : 'post';
+
+      // Create FormData object to handle file upload
+      const formDataToSend = new FormData();
+      Object.entries(formData).forEach(([key, value]) => {
+        if (value !== undefined && value !== null) {
+          formDataToSend.append(key, value.toString());
+        }
+      });
+
+      // Add file if selected
+      if (selectedFile) {
+        formDataToSend.append('book', selectedFile);
+      }
       
-      await axios[method](url, {
-        ...formData,
-        dataEntrega: formData.dataEntrega ? new Date(formData.dataEntrega).toISOString() : null,
+      await axios[method](url, formDataToSend, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
       });
       
       navigate('/');
@@ -82,11 +98,16 @@ export const EmpreendimentoForm: React.FC = () => {
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
+    const { name, value, type, files } = e.target;
+    
+    if (type === 'file' && files) {
+      setSelectedFile(files[0]);
+    } else {
+      setFormData(prev => ({
+        ...prev,
+        [name]: value
+      }));
+    }
   };
 
   return (
@@ -174,6 +195,26 @@ export const EmpreendimentoForm: React.FC = () => {
             onChange={handleChange}
             margin="normal"
           />
+          <Box sx={{ mt: 2 }}>
+            <input
+              accept="application/pdf"
+              style={{ display: 'none' }}
+              id="book-file"
+              name="book"
+              type="file"
+              onChange={handleChange}
+            />
+            <label htmlFor="book-file">
+              <Button variant="outlined" component="span">
+                {selectedFile ? selectedFile.name : 'Upload Book (PDF)'}
+              </Button>
+            </label>
+            {formData.book && !selectedFile && (
+              <Typography variant="caption" display="block" sx={{ mt: 1 }}>
+                Current file: {formData.book}
+              </Typography>
+            )}
+          </Box>
           <TextField
             fullWidth
             select
