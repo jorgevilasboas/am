@@ -30,6 +30,20 @@ model Empreendimento {
   updatedAt     DateTime @updatedAt
 }
 
+model Lead {
+  id            String   @id @default(uuid())
+  nome          String
+  telefone      String
+  email         String?
+  crmLink       String?
+  renda         Float?
+  dataNascimento DateTime?
+  entrada       Float?
+  anotacoes     String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
 enum Role {
   USER
   ADMIN

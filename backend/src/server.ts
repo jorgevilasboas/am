@@ -5,6 +5,7 @@ import { PrismaClient } from '@prisma/client';
 import authRoutes from './routes/auth';
 import userRoutes from './routes/users';
 import empreendimentoRoutes from './routes/empreendimentoRoutes';
+import leadRoutes from './routes/leadRoutes';
 import { errorHandler } from './middlewares/error.middleware';
 
 dotenv.config();
@@ -27,6 +28,7 @@ app.use(express.json());
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/empreendimentos', empreendimentoRoutes);
+app.use('/api/leads', leadRoutes);
 
 // Error handling
 app.use(errorHandler);

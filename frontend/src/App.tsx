@@ -6,6 +6,7 @@ import { Layout } from './components/Layout';
 import Login from './pages/Login';
 import UserManagement from './pages/UserManagement';
 import { Empreendimentos } from './pages/Empreendimentos';
+import { Leads } from './pages/Leads';
 import { EmpreendimentoForm } from './components/EmpreendimentoForm';
 
 const queryClient = new QueryClient();
@@ -42,7 +43,7 @@ function App() {
               path="/leads"
               element={
                 <PrivateRoute>
-                  <div>Leads Page (Coming Soon)</div>
+                  <Leads />
                 </PrivateRoute>
               }
             />

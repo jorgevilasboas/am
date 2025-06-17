@@ -25,6 +25,8 @@ import {
 } from '@mui/icons-material';
 import { useAuth } from '../contexts/AuthContext';
 import axios from 'axios';
+import { format, parseISO } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
 
 interface Empreendimento {
   id: string;
@@ -55,6 +57,13 @@ const headCells: HeadCell[] = [
   { id: 'dataEntrega', label: 'Data de Entrega', numeric: false },
   { id: 'status', label: 'Status', numeric: false },
 ];
+
+// Função utilitária para exibir a data ignorando timezone
+const getLocalDateString = (isoDate: string) => {
+  if (!isoDate) return '-';
+  const [year, month, day] = isoDate.split('T')[0].split('-');
+  return `${day}/${month}/${year}`;
+};
 
 export const Empreendimentos: React.FC = () => {
   const [empreendimentos, setEmpreendimentos] = useState<Empreendimento[]>([]);
@@ -178,7 +187,7 @@ export const Empreendimentos: React.FC = () => {
                 <TableCell>{empreendimento.bairro}</TableCell>
                 <TableCell>{empreendimento.tipo}</TableCell>
                 <TableCell>
-                  {new Date(empreendimento.dataEntrega).toLocaleDateString()}
+                  {getLocalDateString(empreendimento.dataEntrega)}
                 </TableCell>
                 <TableCell>{empreendimento.status}</TableCell>
                 <TableCell align="right">
