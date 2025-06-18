@@ -26,6 +26,7 @@ interface EmpreendimentoFormData {
   book?: string;
   area_de?: number;
   area_ate?: number;
+  unidades?: number;
 }
 
 export const EmpreendimentoForm: React.FC = () => {
@@ -46,6 +47,7 @@ export const EmpreendimentoForm: React.FC = () => {
     tabelaLink: '',
     area_de: undefined,
     area_ate: undefined,
+    unidades: 0,
   });
 
   useEffect(() => {
@@ -79,7 +81,11 @@ export const EmpreendimentoForm: React.FC = () => {
       // Create FormData object to handle file upload
       const formDataToSend = new FormData();
       Object.entries(formData).forEach(([key, value]) => {
-        if (value !== undefined && value !== null) {
+        if (
+          value !== undefined &&
+          value !== null &&
+          !(key === 'unidades' && (value === '' || isNaN(Number(value))))
+        ) {
           formDataToSend.append(key, value.toString());
         }
       });
@@ -259,6 +265,16 @@ export const EmpreendimentoForm: React.FC = () => {
             <MenuItem value="ACTIVE">Ativo</MenuItem>
             <MenuItem value="INACTIVE">Inativo</MenuItem>
           </TextField>
+          <TextField
+            fullWidth
+            label="Unidades"
+            name="unidades"
+            type="number"
+            value={formData.unidades || ''}
+            onChange={handleChange}
+            required
+            margin="normal"
+          />
 
           <Box sx={{ mt: 3, display: 'flex', gap: 2, justifyContent: 'flex-end' }}>
             <Button

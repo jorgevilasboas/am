@@ -33,6 +33,7 @@ model Empreendimento {
   bookOriginalName String? @db.Text
   area_de       Decimal?   @db.Decimal(10,2)
   area_ate      Decimal?   @db.Decimal(10,2)
+  unidades      Int?
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 }

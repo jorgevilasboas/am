@@ -27,7 +27,7 @@ import {
   Notifications as NotificationsIcon,
   Settings as SettingsIcon,
 } from '@mui/icons-material';
-import logoAM from '../assets/logo_am.jpg';
+import logoAM from '../assets/vb_logo.png';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -104,7 +104,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                 <Box
                   component="img"
                   src={logoAM}
-                  alt="Logo AM Imobiliária"
+                  alt="Logo VB Imobiliária"
                   sx={{
                     height: 40,
                     width: 40,
@@ -112,6 +112,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                     objectFit: 'cover',
                     boxShadow: 2,
                     mr: 1.5,
+                    filter: 'brightness(0) invert(1)',
                   }}
                 />
                 <Typography
@@ -124,7 +125,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                     textShadow: '0 2px 8px rgba(0,0,0,0.25)',
                   }}
                 >
-                  AM Imobiliária
+                  Vilas Boas Tech
                 </Typography>
               </Box>
             </Box>

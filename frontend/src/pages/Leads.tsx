@@ -19,7 +19,8 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
-  Grid
+  Grid,
+  Tooltip
 } from '@mui/material';
 import {
   Add as AddIcon,
@@ -263,7 +264,11 @@ export const Leads: React.FC = () => {
           <TableBody>
             {filteredLeads.map((lead) => (
               <TableRow key={lead.id}>
-                <TableCell>{lead.nome}</TableCell>
+                <TableCell>
+                  <Tooltip title={lead.anotacoes || ''} arrow placement="top" enterDelay={400}>
+                    <span style={{ cursor: lead.anotacoes ? 'pointer' : 'default' }}>{lead.nome}</span>
+                  </Tooltip>
+                </TableCell>
                 <TableCell>{lead.telefone}</TableCell>
                 <TableCell>{lead.email}</TableCell>
                 <TableCell align="right">
@@ -308,7 +313,7 @@ export const Leads: React.FC = () => {
         <form onSubmit={handleSubmit}>
           <DialogContent>
             <Grid container spacing={2}>
-              <Grid item xs={12} sm={6}>
+              <Grid item xs={12}>
                 <TextField
                   fullWidth
                   label="Nome"
@@ -316,6 +321,17 @@ export const Leads: React.FC = () => {
                   value={formData.nome}
                   onChange={handleInputChange}
                   required
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  fullWidth
+                  label="Anotações"
+                  name="anotacoes"
+                  value={formData.anotacoes}
+                  onChange={handleInputChange}
+                  multiline
+                  rows={3}
                 />
               </Grid>
               <Grid item xs={12} sm={6}>
@@ -388,17 +404,6 @@ export const Leads: React.FC = () => {
                       entrada: floatValue,
                     }));
                   }}
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  fullWidth
-                  label="Anotações"
-                  name="anotacoes"
-                  value={formData.anotacoes}
-                  onChange={handleInputChange}
-                  multiline
-                  rows={4}
                 />
               </Grid>
             </Grid>

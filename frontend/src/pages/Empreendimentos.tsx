@@ -49,6 +49,7 @@ interface Empreendimento {
   tipo: string;
   dataEntrega: string;
   description: string;
+  unidades?: number;
   status: 'ACTIVE' | 'INACTIVE';
   createdAt: string;
   updatedAt: string;
@@ -73,7 +74,7 @@ const headCells: HeadCell[] = [
   { id: 'bairro', label: 'Bairro', numeric: false },
   { id: 'tipo', label: 'Tipo', numeric: false },
   { id: 'dataEntrega', label: 'Data de Entrega', numeric: false },
-  { id: 'status', label: 'Status', numeric: false },
+  { id: 'unidades', label: 'Unidades', numeric: true },
   { id: 'renda', label: 'Renda Mínima', numeric: true },
   { id: 'area_de', label: 'Área De', numeric: true },
   { id: 'area_ate', label: 'Área Até', numeric: true },
@@ -113,7 +114,7 @@ export const Empreendimentos: React.FC = () => {
   const [order, setOrder] = useState<Order>('desc');
   const navigate = useNavigate();
   const { user } = useAuth();
-  const isAdmin = user?.role === 'ADMIN';
+  const isAdmin = !!user && user.role === 'ADMIN';
 
   const fetchEmpreendimentos = async () => {
     try {
@@ -185,7 +186,7 @@ export const Empreendimentos: React.FC = () => {
       );
     })
     .sort((a, b) => {
-      if (orderBy === 'renda' || orderBy === 'area_de' || orderBy === 'area_ate') {
+      if (orderBy === 'renda' || orderBy === 'area_de' || orderBy === 'area_ate' || orderBy === 'unidades') {
         const aValue = a[orderBy] ?? 0;
         const bValue = b[orderBy] ?? 0;
         return order === 'asc' ? aValue - bValue : bValue - aValue;
@@ -281,13 +282,13 @@ export const Empreendimentos: React.FC = () => {
                   Data de Entrega
                 </TableSortLabel>
               </TableCell>
-              <TableCell width="8%">
+              <TableCell width="8%" align="right">
                 <TableSortLabel
-                  active={orderBy === 'status'}
-                  direction={orderBy === 'status' ? order : 'asc'}
-                  onClick={() => handleRequestSort('status')}
+                  active={orderBy === 'unidades'}
+                  direction={orderBy === 'unidades' ? order : 'asc'}
+                  onClick={() => handleRequestSort('unidades')}
                 >
-                  Status
+                  Unidades
                 </TableSortLabel>
               </TableCell>
               <TableCell width="8%" align="right">
@@ -326,13 +327,23 @@ export const Empreendimentos: React.FC = () => {
             {filteredEmpreendimentos.map((empreendimento) => (
               <TableRow key={empreendimento.id}>
                 <TableCell>{empreendimento.construtora}</TableCell>
-                <TableCell>{empreendimento.empreendimento}</TableCell>
+                <TableCell>
+                  {empreendimento.description && empreendimento.description.trim() !== '' ? (
+                    <Tooltip title={empreendimento.description} arrow placement="top" enterDelay={400}>
+                      <span style={{ cursor: 'pointer' }}>{empreendimento.empreendimento ?? ''}</span>
+                    </Tooltip>
+                  ) : (
+                    empreendimento.empreendimento ?? ''
+                  )}
+                </TableCell>
                 <TableCell>{empreendimento.bairro}</TableCell>
                 <TableCell>{empreendimento.tipo}</TableCell>
                 <TableCell>
                   {getLocalDateString(empreendimento.dataEntrega)}
                 </TableCell>
-                <TableCell>{empreendimento.status}</TableCell>
+                <TableCell align="right">
+                  {empreendimento.unidades !== undefined && empreendimento.unidades !== null ? empreendimento.unidades : '-'}
+                </TableCell>
                 <TableCell align="right">
                   {formatBRL(empreendimento.renda)}
                 </TableCell>

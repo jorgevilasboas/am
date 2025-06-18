@@ -17,6 +17,7 @@ export interface CreateEmpreendimentoInput {
   bookOriginalName?: string;
   area_de?: Decimal | number | string;
   area_ate?: Decimal | number | string;
+  unidades?: number;
 }
 
 export interface UpdateEmpreendimentoInput extends Partial<CreateEmpreendimentoInput> {}
