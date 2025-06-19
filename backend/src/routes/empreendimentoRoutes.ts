@@ -84,6 +84,7 @@ router.post('/', restrictTo('ADMIN'), upload.single('book'), empreendimentoContr
 
 // Update empreendimento (admin only)
 router.patch('/:id', restrictTo('ADMIN'), upload.single('book'), empreendimentoController.update);
+router.put('/:id', restrictTo('ADMIN'), upload.single('book'), empreendimentoController.update);
 
 // Delete empreendimento (admin only)
 router.delete('/:id', restrictTo('ADMIN'), empreendimentoController.delete);

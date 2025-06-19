@@ -34,6 +34,10 @@ export const empreendimentoController = {
         data.unidades = Number(data.unidades);
         if (isNaN(data.unidades)) data.unidades = undefined;
       }
+      if (data.bonusCorretor !== undefined && data.bonusCorretor !== null && data.bonusCorretor !== '') {
+        data.bonusCorretor = Number(data.bonusCorretor);
+        if (isNaN(data.bonusCorretor)) data.bonusCorretor = undefined;
+      }
 
       // Add book file path and original name if uploaded
       if (req.file) {
@@ -122,6 +126,10 @@ export const empreendimentoController = {
       if (data.unidades !== undefined && data.unidades !== null && data.unidades !== '') {
         data.unidades = Number(data.unidades);
         if (isNaN(data.unidades)) data.unidades = undefined;
+      }
+      if (data.bonusCorretor !== undefined && data.bonusCorretor !== null && data.bonusCorretor !== '') {
+        data.bonusCorretor = Number(data.bonusCorretor);
+        if (isNaN(data.bonusCorretor)) data.bonusCorretor = undefined;
       }
 
       // If there's a new file uploaded

@@ -39,6 +39,8 @@ model Empreendimento {
   status        String   @default("ACTIVE")
   renda         Float?
   tabelaLink    String?  @db.Text
+  linkCv        String?  @db.Text
+  bonusCorretor Float?
   book          String?
   bookOriginalName String? @db.Text
   area_de       Decimal?   @db.Decimal(10,2)

@@ -17,6 +17,7 @@ import {
 import { useAuth } from '../contexts/AuthContext';
 import axios from 'axios';
 import { Construtora } from '../types/Construtora';
+import { MoneyInput } from './MoneyInput';
 
 interface EmpreendimentoFormData {
   construtoraId: string;
@@ -28,6 +29,8 @@ interface EmpreendimentoFormData {
   status: 'ACTIVE' | 'INACTIVE';
   renda?: number;
   tabelaLink?: string;
+  linkCv?: string;
+  bonusCorretor?: number;
   book?: string;
   area_de?: number;
   area_ate?: number;
@@ -51,6 +54,8 @@ export const EmpreendimentoForm: React.FC = () => {
     status: 'ACTIVE',
     renda: undefined,
     tabelaLink: '',
+    linkCv: '',
+    bonusCorretor: undefined,
     area_de: undefined,
     area_ate: undefined,
     unidades: 0,
@@ -86,6 +91,8 @@ export const EmpreendimentoForm: React.FC = () => {
         status: data.status,
         renda: data.renda,
         tabelaLink: data.tabelaLink,
+        linkCv: data.linkCv,
+        bonusCorretor: data.bonusCorretor,
         book: data.book,
         area_de: data.area_de,
         area_ate: data.area_ate,
@@ -246,6 +253,22 @@ export const EmpreendimentoForm: React.FC = () => {
             name="tabelaLink"
             value={formData.tabelaLink}
             onChange={handleChange}
+            margin="normal"
+          />
+          <TextField
+            fullWidth
+            label="Link do CV"
+            name="linkCv"
+            value={formData.linkCv}
+            onChange={handleChange}
+            margin="normal"
+          />
+          <MoneyInput
+            fullWidth
+            label="Bonus do Corretor"
+            name="bonusCorretor"
+            value={formData.bonusCorretor ? (formData.bonusCorretor * 100).toString() : ''}
+            onChange={(value, floatValue) => setFormData(prev => ({ ...prev, bonusCorretor: floatValue || undefined }))}
             margin="normal"
           />
           <Box sx={{ display: 'flex', gap: 2 }}>

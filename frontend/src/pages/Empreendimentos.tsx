@@ -60,6 +60,8 @@ interface Empreendimento {
   updatedAt: string;
   renda?: number;
   tabelaLink?: string;
+  linkCv?: string;
+  bonusCorretor?: number;
   book?: string;
   area_de?: number;
   area_ate?: number;
@@ -100,12 +102,14 @@ function NumberFormatCustom(props: NumericFormatProps & { inputRef: any }) {
       allowNegative={false}
       prefix=""
       onValueChange={(values) => {
-        onChange({
-          target: {
-            name: props.name,
-            value: values.value,
-          },
-        });
+        if (onChange) {
+          onChange({
+            target: {
+              name: props.name || '',
+              value: values.value,
+            },
+          } as any);
+        }
       }}
       valueIsNumericString
     />
@@ -191,7 +195,7 @@ export const Empreendimentos: React.FC = () => {
       );
     })
     .sort((a, b) => {
-      if (orderBy === 'renda' || orderBy === 'area_de' || orderBy === 'area_ate' || orderBy === 'unidades') {
+      if (orderBy === 'renda' || orderBy === 'area_de' || orderBy === 'area_ate' || orderBy === 'unidades' || orderBy === 'bonusCorretor') {
         const aValue = a[orderBy] ?? 0;
         const bValue = b[orderBy] ?? 0;
         return order === 'asc' ? aValue - bValue : bValue - aValue;
@@ -331,6 +335,15 @@ export const Empreendimentos: React.FC = () => {
                   Área Até
                 </TableSortLabel>
               </TableCell>
+              <TableCell width="8%" align="right">
+                <TableSortLabel
+                  active={orderBy === 'bonusCorretor'}
+                  direction={orderBy === 'bonusCorretor' ? order : 'asc'}
+                  onClick={() => handleRequestSort('bonusCorretor')}
+                >
+                  Bônus Corretor
+                </TableSortLabel>
+              </TableCell>
               <TableCell width="4%" align="center">Tabela</TableCell>
               <TableCell width="4%" align="center">Book</TableCell>
               <TableCell width="3%" align="right">Ações</TableCell>
@@ -339,14 +352,44 @@ export const Empreendimentos: React.FC = () => {
           <TableBody>
             {filteredEmpreendimentos.map((empreendimento) => (
               <TableRow key={empreendimento.id}>
-                <TableCell>{empreendimento.construtora?.nome ?? ''}</TableCell>
                 <TableCell>
-                  {empreendimento.description && empreendimento.description.trim() !== '' ? (
-                    <Tooltip title={empreendimento.description} arrow placement="top" enterDelay={400}>
-                      <span style={{ cursor: 'pointer' }}>{empreendimento.empreendimento ?? ''}</span>
-                    </Tooltip>
+                  {empreendimento.construtora?.link ? (
+                    <a
+                      href={empreendimento.construtora.link}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{ color: '#1976d2', textDecoration: 'none' }}
+                    >
+                      {empreendimento.construtora?.nome ?? ''}
+                    </a>
                   ) : (
-                    empreendimento.empreendimento ?? ''
+                    empreendimento.construtora?.nome ?? ''
+                  )}
+                </TableCell>
+                <TableCell>
+                  {empreendimento.linkCv ? (
+                    <a
+                      href={empreendimento.linkCv}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{ color: '#1976d2', textDecoration: 'none' }}
+                    >
+                      {empreendimento.description && empreendimento.description.trim() !== '' ? (
+                        <Tooltip title={empreendimento.description} arrow placement="top" enterDelay={400}>
+                          <span style={{ cursor: 'pointer' }}>{empreendimento.empreendimento ?? ''}</span>
+                        </Tooltip>
+                      ) : (
+                        empreendimento.empreendimento ?? ''
+                      )}
+                    </a>
+                  ) : (
+                    empreendimento.description && empreendimento.description.trim() !== '' ? (
+                      <Tooltip title={empreendimento.description} arrow placement="top" enterDelay={400}>
+                        <span style={{ cursor: 'pointer' }}>{empreendimento.empreendimento ?? ''}</span>
+                      </Tooltip>
+                    ) : (
+                      empreendimento.empreendimento ?? ''
+                    )
                   )}
                 </TableCell>
                 <TableCell>{empreendimento.bairro}</TableCell>
@@ -368,6 +411,11 @@ export const Empreendimentos: React.FC = () => {
                 <TableCell align="right">
                   {empreendimento.area_ate !== undefined && empreendimento.area_ate !== null
                     ? `${Number(empreendimento.area_ate).toFixed(2)} m²`
+                    : '-'}
+                </TableCell>
+                <TableCell align="right">
+                  {empreendimento.bonusCorretor !== undefined && empreendimento.bonusCorretor !== null && !isNaN(empreendimento.bonusCorretor)
+                    ? formatBRL(empreendimento.bonusCorretor)
                     : '-'}
                 </TableCell>
                 <TableCell align="center">
