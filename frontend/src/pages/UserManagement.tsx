@@ -21,7 +21,7 @@ export default function UserManagement() {
   const { data: users, isLoading } = useQuery<User[]>({
     queryKey: ['users'],
     queryFn: async () => {
-      const response = await axios.get('http://localhost:5001/api/users', {
+      const response = await axios.get('/api/users', {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`,
         },
@@ -33,7 +33,7 @@ export default function UserManagement() {
   const createUser = useMutation({
     mutationFn: async (newUser: Omit<User, 'id'>) => {
       const response = await axios.post(
-        'http://localhost:5001/api/users',
+        '/api/users',
         newUser,
         {
           headers: {

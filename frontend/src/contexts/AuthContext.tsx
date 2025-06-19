@@ -1,8 +1,14 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import axios from 'axios';
 
-// Configure axios defaults
-axios.defaults.baseURL = 'http://localhost:5001';
+// Configure axios defaults - use current host for external access
+const getBaseURL = () => {
+  const hostname = window.location.hostname;
+  const port = '5001'; // Backend port
+  return `http://${hostname}:${port}`;
+};
+
+axios.defaults.baseURL = getBaseURL();
 axios.defaults.withCredentials = true;
 axios.defaults.headers.common['Content-Type'] = 'application/json';
 axios.defaults.headers.common['Accept'] = 'application/json';

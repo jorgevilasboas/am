@@ -16,7 +16,14 @@ const prisma = new PrismaClient();
 
 // Enable CORS for all routes
 app.use(cors({
-  origin: ['http://localhost:5173', 'http://localhost:5174'], // Allow both frontend ports
+  origin: [
+    'http://localhost:5173', 
+    'http://localhost:5174',
+    'http://10.0.0.186:5173',
+    'http://10.0.0.186:5174',
+    /^http:\/\/10\.0\.0\.\d+:5173$/, // Permite qualquer IP da rede 10.0.0.x
+    /^http:\/\/10\.0\.0\.\d+:5174$/
+  ],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin']
@@ -37,6 +44,8 @@ app.use(errorHandler);
 
 const PORT = process.env.PORT || 5001;
 
-app.listen(PORT, () => {
+app.listen(Number(PORT), '0.0.0.0', () => {
   console.log(`Server is running on port ${PORT}`);
+  console.log(`Access the API at: http://localhost:${PORT}`);
+  console.log(`For external access, use your machine's IP address`);
 }); 

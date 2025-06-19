@@ -26,7 +26,9 @@ import {
   Add as AddIcon,
   Edit as EditIcon,
   Delete as DeleteIcon,
-  Search as SearchIcon
+  Search as SearchIcon,
+  Phone as PhoneIcon,
+  WhatsApp as WhatsAppIcon
 } from '@mui/icons-material';
 import { useAuth } from '../contexts/AuthContext';
 import axios from 'axios';
@@ -66,12 +68,14 @@ function NumberFormatCustom(props: NumericFormatProps & { inputRef: any }) {
       allowNegative={false}
       prefix=""
       onValueChange={(values) => {
-        onChange({
-          target: {
-            name: props.name,
-            value: values.value,
-          },
-        });
+        if (onChange) {
+          onChange({
+            target: {
+              name: props.name || '',
+              value: values.value,
+            },
+          } as any);
+        }
       }}
       valueIsNumericString
     />
@@ -269,7 +273,34 @@ export const Leads: React.FC = () => {
                     <span style={{ cursor: lead.anotacoes ? 'pointer' : 'default' }}>{lead.nome}</span>
                   </Tooltip>
                 </TableCell>
-                <TableCell>{lead.telefone}</TableCell>
+                <TableCell>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <span>{lead.telefone}</span>
+                    <Box sx={{ display: 'flex', gap: 0.5 }}>
+                      <Tooltip title="Ligar">
+                        <IconButton
+                          size="small"
+                          onClick={() => window.open(`tel:${lead.telefone}`, '_self')}
+                          sx={{ color: 'primary.main' }}
+                        >
+                          <PhoneIcon fontSize="small" />
+                        </IconButton>
+                      </Tooltip>
+                      <Tooltip title="Enviar mensagem WhatsApp">
+                        <IconButton
+                          size="small"
+                          onClick={() => {
+                            const phoneNumber = lead.telefone.replace(/\D/g, '');
+                            window.open(`https://api.whatsapp.com/send?phone=55${phoneNumber}`, '_blank');
+                          }}
+                          sx={{ color: 'success.main' }}
+                        >
+                          <WhatsAppIcon fontSize="small" />
+                        </IconButton>
+                      </Tooltip>
+                    </Box>
+                  </Box>
+                </TableCell>
                 <TableCell>{lead.email}</TableCell>
                 <TableCell align="right">
                   {lead.renda ? new Intl.NumberFormat('pt-BR', {
