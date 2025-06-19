@@ -8,13 +8,18 @@ import {
   Typography,
   MenuItem,
   Paper,
-  InputAdornment
+  InputAdornment,
+  FormControl,
+  InputLabel,
+  Select,
+  SelectChangeEvent
 } from '@mui/material';
 import { useAuth } from '../contexts/AuthContext';
 import axios from 'axios';
+import { Construtora } from '../types/Construtora';
 
 interface EmpreendimentoFormData {
-  construtora: string;
+  construtoraId: string;
   empreendimento: string;
   bairro: string;
   tipo: string;
@@ -34,9 +39,10 @@ export const EmpreendimentoForm: React.FC = () => {
   const navigate = useNavigate();
   const isEditing = !!id;
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [construtoras, setConstrutoras] = useState<Construtora[]>([]);
 
   const [formData, setFormData] = useState<EmpreendimentoFormData>({
-    construtora: '',
+    construtoraId: '',
     empreendimento: '',
     bairro: '',
     tipo: '',
@@ -51,18 +57,39 @@ export const EmpreendimentoForm: React.FC = () => {
   });
 
   useEffect(() => {
+    fetchConstrutoras();
     if (isEditing) {
       fetchEmpreendimento();
     }
   }, [id]);
+
+  const fetchConstrutoras = async () => {
+    try {
+      const response = await axios.get('/api/construtoras');
+      setConstrutoras(response.data);
+    } catch (error) {
+      console.error('Error fetching construtoras:', error);
+    }
+  };
 
   const fetchEmpreendimento = async () => {
     try {
       const response = await axios.get(`/api/empreendimentos/${id}`);
       const data = response.data;
       setFormData({
-        ...data,
+        construtoraId: data.construtoraId,
+        empreendimento: data.empreendimento,
+        bairro: data.bairro,
+        tipo: data.tipo,
         dataEntrega: data.dataEntrega ? data.dataEntrega.split('T')[0] : '',
+        description: data.description,
+        status: data.status,
+        renda: data.renda,
+        tabelaLink: data.tabelaLink,
+        book: data.book,
+        area_de: data.area_de,
+        area_ate: data.area_ate,
+        unidades: data.unidades,
       });
     } catch (error) {
       console.error('Error fetching empreendimento:', error);
@@ -76,7 +103,7 @@ export const EmpreendimentoForm: React.FC = () => {
         ? `/api/empreendimentos/${id}`
         : '/api/empreendimentos';
       
-      const method = isEditing ? 'patch' : 'post';
+      const method = isEditing ? 'put' : 'post';
 
       // Create FormData object to handle file upload
       const formDataToSend = new FormData();
@@ -120,6 +147,14 @@ export const EmpreendimentoForm: React.FC = () => {
     }
   };
 
+  const handleSelectChange = (e: SelectChangeEvent) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
   return (
     <Container maxWidth="sm">
       <Paper sx={{ p: 4, mt: 4 }}>
@@ -128,15 +163,23 @@ export const EmpreendimentoForm: React.FC = () => {
         </Typography>
 
         <Box component="form" onSubmit={handleSubmit} sx={{ mt: 2 }}>
-          <TextField
-            fullWidth
-            label="Construtora"
-            name="construtora"
-            value={formData.construtora}
-            onChange={handleChange}
-            required
-            margin="normal"
-          />
+          <FormControl fullWidth margin="normal" required>
+            <InputLabel id="construtora-label">Construtora</InputLabel>
+            <Select
+              labelId="construtora-label"
+              name="construtoraId"
+              value={formData.construtoraId}
+              onChange={handleSelectChange}
+              label="Construtora"
+            >
+              {construtoras.map((construtora) => (
+                <MenuItem key={construtora.id} value={construtora.id}>
+                  {construtora.nome}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+
           <TextField
             fullWidth
             label="Empreendimento"

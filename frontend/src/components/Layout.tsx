@@ -45,6 +45,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
   const menuItems = [
     { text: 'Empreendimentos', icon: <BusinessIcon />, path: '/' },
     { text: 'Leads', icon: <PeopleIcon />, path: '/leads' },
+    { text: 'Construtoras', icon: <BusinessIcon />, path: '/construtoras' },
     { text: 'Usuários', icon: <PersonIcon />, path: '/users' },
   ];
 

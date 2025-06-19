@@ -6,6 +6,7 @@ import authRoutes from './routes/auth';
 import userRoutes from './routes/users';
 import empreendimentoRoutes from './routes/empreendimentoRoutes';
 import leadRoutes from './routes/leadRoutes';
+import construtoraRoutes from './routes/construtoraRoutes';
 import { errorHandler } from './middlewares/error.middleware';
 
 dotenv.config();
@@ -29,6 +30,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/empreendimentos', empreendimentoRoutes);
 app.use('/api/leads', leadRoutes);
+app.use('/api/construtoras', construtoraRoutes);
 
 // Error handling
 app.use(errorHandler);

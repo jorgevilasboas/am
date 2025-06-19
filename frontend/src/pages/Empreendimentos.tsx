@@ -43,7 +43,12 @@ interface User {
 
 interface Empreendimento {
   id: string;
-  construtora: string;
+  construtoraId: string;
+  construtora: {
+    id: string;
+    nome: string;
+    link?: string;
+  };
   empreendimento: string;
   bairro: string;
   tipo: string;
@@ -140,10 +145,10 @@ export const Empreendimentos: React.FC = () => {
     }
   };
 
-  const handleRequestSort = (property: keyof Empreendimento) => {
+  const handleRequestSort = (property: keyof Empreendimento | 'construtora') => {
     const isAsc = orderBy === property && order === 'asc';
     setOrder(isAsc ? 'desc' : 'asc');
-    setOrderBy(property);
+    setOrderBy(property as keyof Empreendimento);
   };
 
   const handleDownloadBook = async (id: string) => {
@@ -179,7 +184,7 @@ export const Empreendimentos: React.FC = () => {
     .filter((empreendimento) => {
       const searchLower = searchTerm.toLowerCase();
       return (
-        empreendimento.construtora.toLowerCase().includes(searchLower) ||
+        (empreendimento.construtora?.nome?.toLowerCase() ?? '').includes(searchLower) ||
         empreendimento.empreendimento.toLowerCase().includes(searchLower) ||
         empreendimento.bairro.toLowerCase().includes(searchLower) ||
         empreendimento.tipo.toLowerCase().includes(searchLower)
@@ -190,6 +195,14 @@ export const Empreendimentos: React.FC = () => {
         const aValue = a[orderBy] ?? 0;
         const bValue = b[orderBy] ?? 0;
         return order === 'asc' ? aValue - bValue : bValue - aValue;
+      }
+
+      if (orderBy === 'construtora') {
+        const aStr = a.construtora?.nome ?? '';
+        const bStr = b.construtora?.nome ?? '';
+        return order === 'asc'
+          ? aStr.localeCompare(bStr)
+          : bStr.localeCompare(aStr);
       }
 
       const aStr = a[orderBy]?.toString() ?? '';
@@ -326,7 +339,7 @@ export const Empreendimentos: React.FC = () => {
           <TableBody>
             {filteredEmpreendimentos.map((empreendimento) => (
               <TableRow key={empreendimento.id}>
-                <TableCell>{empreendimento.construtora}</TableCell>
+                <TableCell>{empreendimento.construtora?.nome ?? ''}</TableCell>
                 <TableCell>
                   {empreendimento.description && empreendimento.description.trim() !== '' ? (
                     <Tooltip title={empreendimento.description} arrow placement="top" enterDelay={400}>

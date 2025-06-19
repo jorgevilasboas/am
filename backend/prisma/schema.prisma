@@ -18,9 +18,19 @@ model User {
   updatedAt DateTime @updatedAt
 }
 
+model Construtora {
+  id            String   @id @default(uuid())
+  nome          String
+  link          String?
+  empreendimentos Empreendimento[]
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
 model Empreendimento {
   id            String   @id @default(uuid())
-  construtora   String
+  construtoraId String
+  construtora   Construtora @relation(fields: [construtoraId], references: [id])
   empreendimento String
   bairro        String
   tipo          String

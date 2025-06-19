@@ -1,8 +1,13 @@
 import { Request, Response, NextFunction } from 'express';
-import { empreendimentoModel, CreateEmpreendimentoInput } from '../models/Empreendimento';
+import { empreendimentoModel } from '../models/Empreendimento';
 import { AppError } from '../middlewares/error.middleware';
+import { upload } from '../utils/upload';
 import fs from 'fs';
 import path from 'path';
+import { PrismaClient } from '@prisma/client';
+import { Decimal } from '@prisma/client/runtime/library';
+
+const prisma = new PrismaClient();
 
 // Function to remove diacritics from text
 const removeDiacritics = (str: string): string => {
@@ -37,7 +42,20 @@ export const empreendimentoController = {
         data.bookOriginalName = removeDiacritics(req.file.originalname);
       }
 
-      const empreendimento = await empreendimentoModel.create(data);
+      // Convert area fields to Decimal if they exist
+      const areaDe = data.area_de ? new Decimal(data.area_de.toString()) : null;
+      const areaAte = data.area_ate ? new Decimal(data.area_ate.toString()) : null;
+
+      const empreendimento = await prisma.empreendimento.create({
+        data: {
+          ...data,
+          area_de: areaDe,
+          area_ate: areaAte
+        },
+        include: {
+          construtora: true
+        }
+      });
       res.status(201).json(empreendimento);
     } catch (error) {
       // Delete uploaded file if there's an error
@@ -54,7 +72,14 @@ export const empreendimentoController = {
 
   async findAll(req: Request, res: Response, next: NextFunction) {
     try {
-      const empreendimentos = await empreendimentoModel.findAll();
+      const empreendimentos = await prisma.empreendimento.findMany({
+        orderBy: {
+          createdAt: 'desc'
+        },
+        include: {
+          construtora: true
+        }
+      });
       res.json(empreendimentos);
     } catch (error) {
       console.error('Error fetching empreendimentos:', error);
@@ -65,7 +90,12 @@ export const empreendimentoController = {
   async findById(req: Request, res: Response, next: NextFunction) {
     try {
       const { id } = req.params;
-      const empreendimento = await empreendimentoModel.findById(id);
+      const empreendimento = await prisma.empreendimento.findUnique({
+        where: { id },
+        include: {
+          construtora: true
+        }
+      });
       
       if (!empreendimento) {
         throw new AppError('Empreendimento not found', 404);
@@ -97,7 +127,9 @@ export const empreendimentoController = {
       // If there's a new file uploaded
       if (req.file) {
         // Get the old file path
-        const oldEmpreendimento = await empreendimentoModel.findById(id);
+        const oldEmpreendimento = await prisma.empreendimento.findUnique({
+          where: { id }
+        });
 
         if (oldEmpreendimento?.book) {
           // Delete the old file
@@ -113,9 +145,23 @@ export const empreendimentoController = {
         data.bookOriginalName = removeDiacritics(req.file.originalname);
       }
 
+      // Convert area fields to Decimal if they exist
+      const areaDe = data.area_de ? new Decimal(data.area_de.toString()) : null;
+      const areaAte = data.area_ate ? new Decimal(data.area_ate.toString()) : null;
+
       console.log('Update data received:', data);
 
-      const updatedEmpreendimento = await empreendimentoModel.update(id, data);
+      const updatedEmpreendimento = await prisma.empreendimento.update({
+        where: { id },
+        data: {
+          ...data,
+          area_de: areaDe,
+          area_ate: areaAte
+        },
+        include: {
+          construtora: true
+        }
+      });
 
       console.log('Final update data:', updatedEmpreendimento);
 
@@ -131,7 +177,9 @@ export const empreendimentoController = {
       const { id } = req.params;
       
       // Delete book file if it exists
-      const empreendimento = await empreendimentoModel.findById(id);
+      const empreendimento = await prisma.empreendimento.findUnique({
+        where: { id }
+      });
       if (empreendimento?.book) {
         const filePath = path.join(__dirname, '../../uploads/books', empreendimento.book);
         if (fs.existsSync(filePath)) {
@@ -139,7 +187,9 @@ export const empreendimentoController = {
         }
       }
 
-      await empreendimentoModel.delete(id);
+      await prisma.empreendimento.delete({
+        where: { id }
+      });
       res.status(204).send();
     } catch (error) {
       console.error('Error deleting empreendimento:', error);

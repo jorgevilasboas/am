@@ -6,6 +6,7 @@ import { Layout } from './components/Layout';
 import Login from './pages/Login';
 import { Empreendimentos } from './pages/Empreendimentos';
 import { Leads } from './pages/Leads';
+import { Construtoras } from './pages/Construtoras';
 import { EmpreendimentoForm } from './components/EmpreendimentoForm';
 import { Users } from './pages/Users';
 import Signup from './pages/Signup';
@@ -47,6 +48,15 @@ const AppRoutes: React.FC = () => {
           element={
             <PrivateRoute>
               <Leads />
+            </PrivateRoute>
+          }
+        />
+        
+        <Route
+          path="/construtoras"
+          element={
+            <PrivateRoute>
+              <Construtoras />
             </PrivateRoute>
           }
         />
