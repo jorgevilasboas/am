@@ -191,6 +191,23 @@ am/
 - `PUT /api/users/:id` - Atualiza um usuário
 - `DELETE /api/users/:id` - Remove um usuário (apenas ADMIN)
 
+## 🚀 Deploy Automático
+
+O projeto está configurado para deploy automático usando GitHub Actions:
+
+- **Backend**: Deploy automático no Railway
+- **Frontend**: Deploy automático no Vercel
+- **CI/CD**: GitHub Actions para integração contínua
+
+### 📋 Configuração Rápida
+
+1. **Railway**: Conecte o repositório e configure as variáveis de ambiente
+2. **Vercel**: Importe o projeto e configure o diretório `frontend`
+3. **GitHub Secrets**: Configure os tokens necessários
+4. **Push para main**: Deploy automático é disparado
+
+Veja o guia completo em [DEPLOY.md](./DEPLOY.md)
+
 ## 🛠️ Configuração e Instalação
 
 ### Pré-requisitos
